@@ -2,7 +2,7 @@
 % Peter Ferrero, Oregon State University, 5/5/2018, MTH 553 HW3
 % A function to compute the finite difference for the heat equation.
 
-function [h, u, x, T] = HeatFiniteDifference(parameters)
+function [h, u, x, T, maxErr] = HeatFiniteDifference(parameters)
 
     n = parameters(1);
     a = parameters(2);
@@ -25,18 +25,16 @@ function [h, u, x, T] = HeatFiniteDifference(parameters)
     
     N = length(t);
     
+    maxErr = 0;
     
-    
-    for i = 1:N-1
+    for i = 2:N
     
         u = A\F;
         
         u = Problem1_BC(u);
         F = B*u;
         
-%         plot(x,u,'k-')
-%         axis([0,1,0,1.1])
-%         pause(0.5)
+        maxErr = max(maxErr,max(abs(u-Problem1_Exact(x,t(i)))));
         
     end
     

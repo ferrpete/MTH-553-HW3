@@ -6,14 +6,14 @@
 n = [10 20 50 100];
 a = 0;
 b = 1;
-T = 0.14;
+T = 1;
 theta = 1;
 N = length(n);
 M = length(theta);
 k = 1;
 
 h = (b-a)/n(4);
-dt = h^2/200;
+dt = 0.0001;
 
 parameters(1) = 0;
 parameters(2) = a;
@@ -28,16 +28,33 @@ for i=1:M
     u = cell(N,1);
     x = cell(N,1);
     ue = cell(N,1);
+    maxErr = zeros(N,1);
+    T = zeros(N,1);
     
     for j=1:N
         
         parameters(1) = n(j);
         parameters(5) = theta(i);
-        [h(j),u{j},x{j},Tend] = HeatFiniteDifference(parameters);
-        ue{j} = Problem1_Exact(x{j},Tend);
+        [h(j),u{j},x{j},T(j),maxErr(j)] = HeatFiniteDifference(parameters);
+        ue{j} = Problem1_Exact(x{j});
         
     end
     
-    Problem1_Plotter(h,u,ue,x)
+    figure
+    loglog(h,h,'k-',h,maxErr,'r*-')
+    xlabel('Stepsize, h')
+    ylabel('Grid Norm')
+    title('Infinity Norm Error for u_t - u_xx = 0')
+    legend('Linear','L^{\infty}')
+    legend('location','southeast')
+    axis([-inf,inf,-inf,inf])
+    
+    alpha = zeros(N-1,1);
+    
+    for k=1:N-1
+        
+        alpha(k) = (log(maxErr(k+1))-log(maxErr(k)))/(log(h(k+1))-log(h(k)));
+        
+    end
     
 end
